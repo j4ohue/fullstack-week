@@ -1,0 +1,61 @@
+# Encurtador de URLs com analytics
+
+MVP do Dia 1 da semana de projetos full stack.
+
+![Dashboard](docs/dashboard.png)
+
+## Stack
+
+Next.js (App Router) · Node/Express · Prisma · PostgreSQL (Docker) · JWT
+
+## Funcionalidades
+
+- Cadastro e login com JWT
+- Criação de links curtos (autenticado)
+- Redirecionamento público com registro de cada clique
+- Dashboard com contagem de cliques e gráfico por dia (recharts)
+
+## Como rodar
+
+```bash
+# 1. banco
+docker compose up -d
+
+# 2. API
+cd api
+cp .env.example .env   # ou crie o .env (veja abaixo)
+npm install
+npx prisma migrate dev
+npm run dev
+
+# 3. Frontend (outro terminal)
+cd web
+npm install
+npm run dev
+```
+
+Variáveis da API (`api/.env`):
+
+```env
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/shortener?schema=public"
+JWT_SECRET="troque-isso"
+PORT=3001
+BASE_URL="http://localhost:3001"
+```
+
+Variável do frontend (`web/.env.local`):
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:3001
+```
+
+## Rotas da API
+
+| Método | Rota | Auth | Descrição |
+|--------|------|------|-----------|
+| POST | /auth/register | não | Cria usuário |
+| POST | /auth/login | não | Login, devolve JWT |
+| POST | /links | sim | Cria link curto |
+| GET | /links | sim | Lista links com cliques |
+| GET | /links/:id/stats | sim | Cliques por dia |
+| GET | /:code | não | Redireciona e registra clique |
