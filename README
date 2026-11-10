@@ -1,9 +1,5 @@
 # Encurtador de URLs com analytics
 
-MVP do Dia 1 da semana de projetos full stack.
-
-![Dashboard](docs/dashboard.png)
-
 ## Stack
 
 Next.js (App Router) · Node/Express · Prisma · PostgreSQL (Docker) · JWT
