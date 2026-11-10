@@ -79,5 +79,38 @@ router.get("/", auth, async (req, res) => {
     res.status(500).json({ error: "Erro interno" });
   }
 });
+router.get("/:id/stats", auth, async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    if (!Number.isInteger(id)) {
+      return res.status(400).json({ error: "ID inválido" });
+    }
 
+    const link = await prisma.link.findFirst({
+      where: { id, userId: req.userId },
+    });
+    if (!link) {
+      return res.status(404).json({ error: "Link não encontrado" });
+    }
+
+    const rows = await prisma.$queryRaw`
+      SELECT to_char(date_trunc('day', "createdAt"), 'YYYY-MM-DD') AS date,
+             COUNT(*)::int AS clicks
+      FROM "Click"
+      WHERE "linkId" = ${id}
+      GROUP BY 1
+      ORDER BY 1
+    `;
+
+    res.json({
+      id: link.id,
+      code: link.code,
+      total: rows.reduce((sum, r) => sum + r.clicks, 0),
+      byDay: rows,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erro interno" });
+  }
+});
 module.exports = router;
